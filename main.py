@@ -1,36 +1,38 @@
 import sys
 import random
-from PyQt6.QtWidgets import QApplication, QMainWindow
-from PyQt6.QtGui import QPainter, QColor, QPen
-from PyQt6.uic import loadUi
+from PyQt6.QtWidgets import QApplication, QWidget, QPushButton
+from PyQt6.QtGui import QPainter, QColor, QPen, QBrush
 
 
-class CircleWindow(QMainWindow):
+class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
+        self.setGeometry(100, 100, 600, 400)
+        self.button = QPushButton("Draw Circle", self)
+        self.button.setGeometry(225, 350, 150, 30)
+        self.button.clicked.connect(self.add_circle)
         self.circles = []
-        loadUi('UI.ui', self)
-        self.pushButton.clicked.connect(self.add_circle)
 
     def add_circle(self):
-        x = random.randint(0, self.width() - 50)
-        y = random.randint(0, self.height() - 50)
-        diameter = random.randint(10, 50)
-        self.circles.append((x, y, diameter))
+        radius = random.randint(10, 50)
+        x = random.randint(radius, self.width() - radius)
+        y = random.randint(radius, self.height() - radius)
+        color = QColor(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        self.circles.append((x, y, radius, color))
         self.update()
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        pen = QPen(QColor("yellow"), 2)
-        painter.setPen(pen)
-        painter.setBrush(QColor("yellow"))
-
-        for x, y, diameter in self.circles:
-            painter.drawEllipse(x, y, diameter, diameter)
+        for x, y, radius, color in self.circles:
+            pen = QPen(color, 2)
+            brush = QBrush(color)
+            painter.setPen(pen)
+            painter.setBrush(brush)
+            painter.drawEllipse(x - radius, y - radius, 2 * radius, 2 * radius)
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = CircleWindow()
+    window = MainWindow()
     window.show()
     sys.exit(app.exec())
